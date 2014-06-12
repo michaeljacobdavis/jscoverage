@@ -27,6 +27,7 @@ jscoverage.processFile(source, dest, exclude, {});
 
 function helpInfo() {
   var help = [];
+  help.push('version: 0.3.8-fix');
   help.push('usage:');
   help.push('\t> jscoverage source');
   help.push('\t## this is equal : jscoverage source source-cov | jscoverage source.js source-cov.js');
