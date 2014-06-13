@@ -69,7 +69,7 @@ exports.processFile = function (source, dest, exclude, option) {
   var content;
   var stats;
   var flag;
-  var _exclude = [/^\./];
+  var _exclude = [];
   var self = this;
   /*
   var exp_abs = /^\//;
@@ -97,6 +97,17 @@ exports.processFile = function (source, dest, exclude, option) {
   if (flag === 'file') { // process file
     mkdirSync(path.dirname(dest));
     var extname = path.extname(source);
+
+    var excludePath;
+    for (var n = 0 ; n < _exclude.length; n++) {
+      excludePath = _exclude[n];
+      if ( (typeof excludePath === 'string' && excludePath === source) || (typeof excludePath === 'object' && excludePath.test(source)) ) {
+        content = fs.readFileSync(source);
+        fs.writeFileSync(dest, content);
+        return;
+      }
+    }
+
     if (extname !== '.js') {
       // if it is not a js file, copy it
       content = fs.readFileSync(source);
@@ -110,18 +121,12 @@ exports.processFile = function (source, dest, exclude, option) {
   } else { // process dir
     var nodes = fs.readdirSync(source);
     var tmpPath, tmpDest;
-    var ignoreLen = _exclude.length;
     nodes.forEach(function (v) {
       // ignore filter
-      var m;
-      for (var n = 0 ; n < ignoreLen; n++) {
-        m = _exclude[n];
-        if (typeof m === 'string' && m === v) {
+      if(/^\./.test(v)){
           return;
-        } else if (typeof m === 'object' && m.test(v)) {
-          return;
-        }
       }
+
       // process file
       tmpPath = path.join(source, v);
       tmpDest = path.join(dest, v);
